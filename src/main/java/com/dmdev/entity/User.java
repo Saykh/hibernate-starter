@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -57,28 +58,33 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 
-/* (6) */
 @TypeDef(name = "dmdev", typeClass = JsonBinaryType.class)
-
-/* У нас название сущности отличается от названия таблицы в БД, поэтому используем данную аннотацию. */
 @Table(name = "users")
 
 public class User {
 
-    @EmbeddedId
-    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
-    private PersonalInfo personalInfo;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 
     @Column(unique = true)
     private String username;
 
 
+    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
+    private PersonalInfo personalInfo;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
     @Type(type = "dmdev")
     private String info;
+
+
+    @ManyToOne
+    @JoinColumn(name = "company_id") /* Необязательно. По умолчанию в табличке юзер будет создана колонка company_id */
+    private Company company;
+
 }

@@ -1,10 +1,7 @@
 package com.dmdev;
 
 import com.dmdev.converter.BirthdayConverter;
-import com.dmdev.entity.BirthDay;
-import com.dmdev.entity.PersonalInfo;
-import com.dmdev.entity.Role;
-import com.dmdev.entity.User;
+import com.dmdev.entity.*;
 import com.dmdev.util.HibernateUtil;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +18,19 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 @Slf4j // private static final Logger log = LoggerFactory.getLogger(HibernateRunner.class);
-
 public class HibernateRunner {
 
 
 
 
     public static void main(String[] args) throws SQLException {
+
+        /*
+            (1)
+        */
+        Company company = Company.builder()
+                .name("Google")
+                .build();
 
 
         User user = User.builder()
@@ -44,59 +47,40 @@ public class HibernateRunner {
                             "id" : 3
                         }
                         """)
+
+                /*
+                    (2)
+                */
+                .company(company)
                 .build();
-        log.info("User entity is in transient state, object: {}", user);
 
 
         try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory()) {
             Session session1 = sessionFactory.openSession();
             try (session1) {
                 Transaction transaction = session1.beginTransaction();
-                log.trace("Transaction is created, {}", transaction);
-
-                session1.save(user);
-                log.trace("User is in persistent state: {}, session {}", user, session1);
 
                 /*
-                    Окей, мы сохранили. Теперь как получить его по такому сложному ключу?
+                    (3) Регистрируем в hibernate.cfg.xml, либо в нашем HibernateUtil классе.
+                    (4) Сохраняем.
+
+
+                */
+                session1.save(company);
+                session1.save(user);
+
+                /*
+                    В нашем PersistentContext будет две сущности.
+
+                    
                 */
 
 
                 session1.getTransaction().commit();
 
-                log.trace("User is in detached state: {}, session is closed {}", user, session1);
 
-
-            } catch (Exception e) {
-                log.error("Exception occurred", e);
-                throw e; // Пробросим дальше, что легло приложение.
             }
 
-
-            try (Session session2 = sessionFactory.openSession()) {
-                session2.beginTransaction();
-
-                /*
-                    Билдим на ключ. Теперь получаем класс и передаем в get не примитив, а наш сложный
-                    первичный ключ.
-                    На практике не стоит использовать их, лучше IDENTITY, когда таблица сама отвечает за
-                    простой синтетический идентификатор.
-
-
-                 */
-
-
-                PersonalInfo personalInfo = PersonalInfo.builder()
-                        .firstname("Albina")
-                        .lastname("Edilova")
-                        .birthDate(new BirthDay(LocalDate.of(1993, 4, 8)))
-                        .build();
-
-
-
-                User userGet = session2.get(User.class, personalInfo);
-            }
         }
-
     }
 }

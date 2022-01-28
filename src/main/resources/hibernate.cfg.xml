@@ -17,7 +17,12 @@
         <!-- Чтобы он ещё и красивое форматировал его -->
         <property name="format_sql">true</property>
         <!-- (1) -->
+
+
+
         <mapping class="com.dmdev.entity.User"/>
+
+        <mapping class="com.dmdev.entity.Company"/>
 
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
