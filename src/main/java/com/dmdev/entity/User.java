@@ -71,16 +71,14 @@ public class User {
     @Id
     private String username;
 
-    private String firstname;
-    private String lastname;
+    @Embedded // Необязательно. Говорим, что сущностность встраиваемая.
+    /*
+        Если имена полей в встриваемых компонентах не соотвествуют тому, что в БД.
+        И таких атрибутов можно создать несколько. В какой-то степени аналог @Column.
 
-    /* (2) */
-    @Column(name = "birth_date")
-    /* private LocalDate birthDate; */
-
-    /* (3) Скажем Hibernate использовать тут наш конвертер. */
-    @Convert(converter = BirthdayConverter.class)
-    private BirthDay birthDate;
+    */
+    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
+    private PersonalInfo personalInfo;
 
 
     /*

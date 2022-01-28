@@ -2,6 +2,7 @@ package com.dmdev;
 
 import com.dmdev.converter.BirthdayConverter;
 import com.dmdev.entity.BirthDay;
+import com.dmdev.entity.PersonalInfo;
 import com.dmdev.entity.Role;
 import com.dmdev.entity.User;
 import com.dmdev.util.HibernateUtil;
@@ -37,15 +38,17 @@ public class HibernateRunner {
 
         */
         User user = User.builder()
-                .username("edilov_st@mail.ru")
-                .firstname("Saykhan")
-                .lastname("Edilov")
-                .birthDate(new BirthDay(LocalDate.of(1994, 7, 23)))
+                .username("edilova_at@mail.ru")
+                .personalInfo(PersonalInfo.builder()
+                        .firstname("Albina")
+                        .lastname("Edilova")
+                        .birthDate(new BirthDay(LocalDate.of(1993, 4, 8)))
+                        .build())
                 .role(Role.ADMIN)
                 .info("""
                             {
-                                "name": "Saykhan",
-                                "id" : 1
+                                "name": "Albina",
+                                "id" : 2
                             }
                             """)
                 .build();
