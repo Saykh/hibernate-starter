@@ -65,37 +65,13 @@ import java.time.LocalDate;
 
 public class User {
 
-    @Id
-    /*
-        @GeneratedValue - не вставляй это поле в базу данных - говорим мы ему.
-        Стратегии:
-        1. Auto - выберет либо Identity, Sequence или Table в зависимости от выбранной СУБД
-        и выбранного диалекта. В случае с Postgres это Sequence.
-        В нашем случае, когда БД сама отвествененна за генерацию id, ибо мы поставили BigSerial,
-        нам лучше взять Identity, который побеждает других по производительности и простоте.
+    @EmbeddedId
+    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
+    private PersonalInfo personalInfo;
 
-        2. Sequence - последовательность, аналог счётчика. Тип в СУБД наравне с таблицами, представлениями и т.д.
-        Счётчик, который инкремент-ся после каждого вызова. Можем его и сами создать - CREATE Sequence название
-        и т.д., там ещё можно задавать насколько мы будем инкрем-ть, с какого значения будет начинать инкрем-ть,
-        какой колонке будет принадлежать (может принадлежать нескольким колонкам).
-        Создали свой, потом должны ещё указать через @SequenceGenerator(), что используем типо свою
-        табличку sequence.
-
-
-        3. Table - старая хрень, которая используется, если ваша СУБД не поддерживает автореген
-        ключей или последовательностей.
-        @TableGenerator()
-
-    */
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(unique = true)
     private String username;
-
-    @Embedded // Необязательно. Говорим, что сущностность встраиваемая.
-    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
-    private PersonalInfo personalInfo;
 
 
 
