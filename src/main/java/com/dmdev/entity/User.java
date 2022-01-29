@@ -2,10 +2,7 @@ package com.dmdev.entity;
 
 import com.dmdev.converter.BirthdayConverter;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -56,6 +53,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "username") // Наш натуральный уникальный "ключ"!
+@ToString(exclude = "company")
 @Builder
 
 @TypeDef(name = "dmdev", typeClass = JsonBinaryType.class)
