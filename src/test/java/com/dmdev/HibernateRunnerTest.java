@@ -1,7 +1,12 @@
 package com.dmdev;
 
 import com.dmdev.entity.BirthDay;
+import com.dmdev.entity.Company;
+import com.dmdev.entity.PersonalInfo;
 import com.dmdev.entity.User;
+import com.dmdev.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.Column;
@@ -28,10 +33,11 @@ class HibernateRunnerTest {
     void checkReflectionApi() throws SQLException, IllegalAccessException {
 
         User user = User.builder()
-                .username("edilov_st@mail.ru")
-                .firstname("Saykhan")
-                .lastname("Edilov")
-                .birthDate(new BirthDay(LocalDate.of(1994, 7, 23)))
+
+                .personalInfo(PersonalInfo.builder()
+                        .firstname("Mansur")
+                        .birthDate(new BirthDay(LocalDate.of(1994, 7, 23)))
+                        .build())
                 .build();
 
         String sql = """
@@ -43,32 +49,23 @@ class HibernateRunnerTest {
                 (%s)
                 """;
 
-        /*
-               TableName - динамическое составляющее первого значения.
-               Если есть аннотация Table над нашей сущностью, возьми её, трансформируй в вид => схема.имятаблицы.
-               Иначе же просто возьми имя таблицы.
-        */
+
         String tableName = Optional.ofNullable(user.getClass().getAnnotation(Table.class))
                 .map(tableAnnotation -> tableAnnotation.schema() + "." + tableAnnotation.name())
                 .orElse(user.getClass().getName());
 
 
-        /*
-            Получим все поля и их названия.
-        */
 
         Field[] declaredFields = user.getClass().getDeclaredFields();
 
-        String columnNames =  Arrays.stream(declaredFields)
+        String columnNames = Arrays.stream(declaredFields)
                 .map(field -> Optional.ofNullable(field.getAnnotation(Column.class))
-                .map(Column::name)
-                .orElse(field.getName()))
+                        .map(Column::name)
+                        .orElse(field.getName()))
                 .collect(Collectors.joining(", "));
 
 
-        /*
-            Передаем поля вместо ? знаков.
-        */
+
 
         String columnsValues = Arrays.stream(declaredFields)
                 .map(field -> "?")
@@ -77,10 +74,7 @@ class HibernateRunnerTest {
         System.out.println(sql.formatted(tableName, columnNames, columnsValues));
 
 
-        /*
-            Теперь остался preparedStatement. Засунуть туда этот SQL и циклом пробежаться по каждому полю.
-        */
-
+  
         Connection connection = null;
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql.formatted(tableName,
@@ -88,14 +82,55 @@ class HibernateRunnerTest {
 
         for (Field declaredField : declaredFields) {
             declaredField.setAccessible(true);
-            preparedStatement.setObject(1, declaredField.get (user));
+            preparedStatement.setObject(1, declaredField.get(user));
         }
 
     }
 
 
+    @Test
+    void OneToMany() {
+
+        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory()) {
+            Session session = sessionFactory.openSession();
+
+            session.beginTransaction();
+
+            Company company = session.get(Company.class, 1L);
+
+            System.out.println();
+
+            session.getTransaction().commit();
+
+        }
+    }
 
 
+    @Test
+    void addUserToNewCompany() {
+
+        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory()) {
+            Session session = sessionFactory.openSession();
+
+            session.beginTransaction();
+
+            Company company = Company.builder()
+                    .name("Facebook")
+                    .build();
+
+            User user = User.builder()
+                    .username("Aska")
+                    .build();
+
+            company.addUser(user);
+
+            session.save(company);
 
 
+            session.getTransaction().commit();
+
+        }
+
+
+    }
 }

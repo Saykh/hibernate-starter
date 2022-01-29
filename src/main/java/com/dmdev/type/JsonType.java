@@ -32,15 +32,7 @@ public class JsonType implements UserType {
         return 0;
     }
 
-    /*
-        Короче, сложно описывать какие-то нестандартные типы данных, проще использовать
-        готовые библиотеки, что мы и сделали. Подтянули зависимость:
-        implementation 'com.vladmihalcea:hibernate-types-52:2.14.0'.
-        Накинули аннотации и зарегистрировали наш новый тип:
-        configuration.registerTypeOverride(new JsonBinaryType());
 
-
-    */
 
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {

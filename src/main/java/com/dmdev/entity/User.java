@@ -83,16 +83,9 @@ public class User {
     private String info;
 
 
-    /*
-        (optional = false)
-        Мы будем обязаны устанавливать company_id в нашу сущность. Теперь он не будет использовать left join, который
-        худе inner Join, подтягивая наши компании.
 
-        fetch = ..... По умолчанию он EAGER (жадный), именно поэтому мы сразу получаем наши компании. Для коллекций он
-        по умолчанию LAZY (ленивый).
-    */
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-    @JoinColumn(name = "company_id") /* Необязательно. По умолчанию в табличке юзер будет создана колонка company_id */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id")
     private Company company;
 
 }

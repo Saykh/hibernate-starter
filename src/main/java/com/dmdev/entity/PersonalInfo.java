@@ -16,7 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Embeddable // Укажем, что это встраиваемый компонент.
+@Embeddable
 
 public class PersonalInfo implements Serializable {
 
